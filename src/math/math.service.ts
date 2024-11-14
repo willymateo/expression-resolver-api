@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { ApplyOperatorProps } from './main.types';
+import { ApplyMathOperatorProps } from './main.types';
 
 @Injectable()
 class MathService {
@@ -17,10 +17,6 @@ class MathService {
 
     // Remove whitespaces
     mathExpressionString = mathExpressionString.replace(/\s/g, '');
-
-    console.log({
-      mathExpressionString,
-    });
 
     for (let i = 0; i < mathExpressionString.length; i++) {
       const stringCharacter = mathExpressionString[i];
@@ -43,6 +39,7 @@ class MathService {
           i++;
         }
 
+        i--; // Move back one position because the final while loop
         numericValues.push(Number.parseInt(num));
       } else if (isOpeningParenthesis) {
         mathOperators.push(stringCharacter);
@@ -52,7 +49,7 @@ class MathService {
           const rightNumber = numericValues.pop();
           const leftNumber = numericValues.pop();
 
-          const result = this.applyOperator({
+          const result = this.applyMathOperator({
             mathOperator,
             leftNumber,
             rightNumber,
@@ -60,6 +57,8 @@ class MathService {
 
           numericValues.push(result);
         }
+
+        mathOperators.pop(); // Remove '('
       } else if (isMathOperator) {
         while (
           mathOperators.length &&
@@ -72,7 +71,7 @@ class MathService {
           const rightNumber = numericValues.pop();
           const leftNumber = numericValues.pop();
 
-          const result = this.applyOperator({
+          const result = this.applyMathOperator({
             mathOperator,
             leftNumber,
             rightNumber,
@@ -85,14 +84,28 @@ class MathService {
       }
     }
 
+    while (mathOperators.length) {
+      const mathOperator = mathOperators.pop();
+      const rightNumber = numericValues.pop();
+      const leftNumber = numericValues.pop();
+
+      const result = this.applyMathOperator({
+        mathOperator,
+        leftNumber,
+        rightNumber,
+      });
+
+      numericValues.push(result);
+    }
+
     return numericValues[0];
   }
 
-  private applyOperator({
+  private applyMathOperator({
     mathOperator,
     leftNumber,
     rightNumber,
-  }: ApplyOperatorProps): number {
+  }: ApplyMathOperatorProps): number {
     switch (mathOperator) {
       case '+':
         return leftNumber + rightNumber;

@@ -1,4 +1,4 @@
-export type ApplyOperatorProps = {
+export type ApplyMathOperatorProps = {
   leftNumber: number;
   rightNumber: number;
   mathOperator: string;
