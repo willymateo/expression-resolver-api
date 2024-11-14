@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-import { ApplyLastOperatorProps, ApplyMathOperatorProps } from './math.types';
+import {
+  AnalyzeDigitsInMathExpressionProps,
+  AnalyzeClosingParenthesisProps,
+  AnalyzeMathOperatorProps,
+  ApplyLastOperatorProps,
+  ApplyMathOperatorProps,
+} from './math.types';
 
 @Injectable()
 class MathService {
@@ -20,55 +26,34 @@ class MathService {
 
     for (let i = 0; i < mathExpressionString.length; i++) {
       const stringCharacter = mathExpressionString[i];
-
       const isOpeningParenthesis = stringCharacter === '(';
       const isClosingParenthesis = stringCharacter === ')';
 
       if (this.characterIsNumber(stringCharacter)) {
-        let num = '';
-
-        // Check if the number has more than one digit
-        while (
-          i < mathExpressionString.length &&
-          !Number.isNaN(Number.parseInt(mathExpressionString[i]))
-        ) {
-          num = `${num}${mathExpressionString[i]}`;
-          i++;
-        }
-
-        i--; // Move back one position because the final while loop
-        numericValues.push(Number.parseInt(num));
+        i = this.analyzeDigitsInMathExpression({
+          mathExpressionString,
+          numericValues,
+          i,
+        });
       } else if (isOpeningParenthesis) {
         mathOperators.push(stringCharacter);
       } else if (isClosingParenthesis) {
-        while (mathOperators[mathOperators.length - 1] !== '(') {
-          this.applyLastOperator({
-            numericValues,
-            mathOperators,
-          });
-        }
-
-        mathOperators.pop(); // Remove '('
+        this.analyzeClosingParenthesis({
+          mathOperators,
+          numericValues,
+        });
       } else if (this.characterIsMathOperator(stringCharacter)) {
-        while (
-          mathOperators.length &&
-          mathOperators[mathOperators.length - 1] !== '(' &&
-          MathService.OPERATORS_PRIORITY[
-            mathOperators[mathOperators.length - 1]
-          ] >= MathService.OPERATORS_PRIORITY[stringCharacter]
-        ) {
-          this.applyLastOperator({
-            numericValues,
-            mathOperators,
-          });
-        }
-
-        mathOperators.push(stringCharacter);
+        this.analyzeMathOperator({
+          stringCharacter,
+          mathOperators,
+          numericValues,
+        });
       } else {
         throw new Error(`Unexpected token '${stringCharacter}'`);
       }
     }
 
+    // Process the remaining math operations
     while (mathOperators.length) {
       this.applyLastOperator({
         numericValues,
@@ -77,6 +62,63 @@ class MathService {
     }
 
     return numericValues[0];
+  }
+
+  private analyzeDigitsInMathExpression({
+    mathExpressionString = '',
+    numericValues = [],
+    i = 0,
+  }: AnalyzeDigitsInMathExpressionProps) {
+    let num = '';
+
+    // Check if the number has more than one digit
+    while (
+      i < mathExpressionString.length &&
+      this.characterIsNumber(mathExpressionString[i])
+    ) {
+      num = `${num}${mathExpressionString[i]}`;
+      i++;
+    }
+
+    i--; // Move back one position because the final while loop
+
+    numericValues.push(Number.parseInt(num));
+
+    return i;
+  }
+
+  private analyzeClosingParenthesis({
+    mathOperators = [],
+    numericValues = [],
+  }: AnalyzeClosingParenthesisProps) {
+    while (mathOperators[mathOperators.length - 1] !== '(') {
+      this.applyLastOperator({
+        numericValues,
+        mathOperators,
+      });
+    }
+
+    mathOperators.pop(); // Remove '('
+  }
+
+  private analyzeMathOperator({
+    stringCharacter = '',
+    mathOperators = [],
+    numericValues = [],
+  }: AnalyzeMathOperatorProps) {
+    while (
+      mathOperators.length &&
+      mathOperators[mathOperators.length - 1] !== '(' &&
+      MathService.OPERATORS_PRIORITY[mathOperators[mathOperators.length - 1]] >=
+        MathService.OPERATORS_PRIORITY[stringCharacter]
+    ) {
+      this.applyLastOperator({
+        numericValues,
+        mathOperators,
+      });
+    }
+
+    mathOperators.push(stringCharacter);
   }
 
   private applyLastOperator({
