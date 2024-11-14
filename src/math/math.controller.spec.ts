@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { HttpException } from '@nestjs/common';
 
 import { MathController } from './math.controller';
 import { MathService } from './math.service';
@@ -15,7 +16,7 @@ describe('MathController', () => {
     controller = module.get<MathController>(MathController);
   });
 
-  describe('/math/resolve', () => {
+  describe('/math/resolve [POST]', () => {
     it('should return -27', () => {
       expect(
         controller.resolve({
@@ -28,13 +29,11 @@ describe('MathController', () => {
 
     describe('Error cases', () => {
       it('Unexpected token', () => {
-        expect(
+        expect(() => {
           controller.resolve({
             mathExpression: '5ab5',
-          }),
-        ).toEqual({
-          error: "Unexpected token 'a'",
-        });
+          });
+        }).toThrow(HttpException);
       });
     });
   });

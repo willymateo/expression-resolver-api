@@ -30,10 +30,6 @@ describe('MathService', () => {
   });
 
   describe('Error cases', () => {
-    // it('Bad expression', () => {
-    // expect(service.resolveMathExpressionFromString('3 + 5 * (2 - 8)'));
-    // });
-
     it('Unexpected token', () => {
       expect(() => {
         service.resolveMathExpressionFromString('5ab5');

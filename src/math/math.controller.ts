@@ -1,4 +1,11 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import {
+  HttpException,
+  Controller,
+  HttpStatus,
+  HttpCode,
+  Body,
+  Post,
+} from '@nestjs/common';
 
 import { ResolveDTO } from './dto/resolve.dto';
 import { MathService } from './math.service';
@@ -9,7 +16,8 @@ import { MathService } from './math.service';
 class MathController {
   constructor(private mathService: MathService) {}
 
-  @Get('resolve')
+  @Post('resolve')
+  @HttpCode(HttpStatus.OK)
   resolve(@Body() { mathExpression }: ResolveDTO): any {
     try {
       const result =
@@ -21,9 +29,14 @@ class MathController {
     } catch (error) {
       console.log('Error resolving math expresssion from string', error);
 
-      return {
-        error: error?.message,
-      };
+      throw new HttpException(
+        {
+          message: [error?.message],
+          error: 'Bad Request',
+          statusCode: HttpStatus.BAD_REQUEST,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }
