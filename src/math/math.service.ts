@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { ApplyMathOperatorProps } from './main.types';
+import { ApplyMathOperatorProps } from './math.types';
 
 @Injectable()
 class MathService {
