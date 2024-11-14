@@ -2,8 +2,8 @@
 
 <p align="center">
 
-  [![Run unit tests](https://github.com/willymateo/expression-resolver-api/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/willymateo/expression-resolver-api/actions/workflows/unit-tests.yml)
-  [![Run end-to-end tests](https://github.com/willymateo/expression-resolver-api/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/willymateo/expression-resolver-api/actions/workflows/e2e-tests.yml)
+[![Run unit tests](https://github.com/willymateo/expression-resolver-api/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/willymateo/expression-resolver-api/actions/workflows/unit-tests.yml)
+[![Run end-to-end tests](https://github.com/willymateo/expression-resolver-api/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/willymateo/expression-resolver-api/actions/workflows/e2e-tests.yml)
 
 </p>
 
@@ -39,4 +39,28 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+```
+
+## API documentation
+
+### Resolve a mathematical expression in a string
+
+```http
+POST /math/resolve
+```
+
+#### Request - Body
+
+```json
+{
+  "mathExpression": "10 * (2 + 5) * 10"
+}
+```
+
+#### Response
+
+```json
+{
+  "result": 700
+}
 ```
