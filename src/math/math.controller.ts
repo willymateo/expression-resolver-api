@@ -11,12 +11,20 @@ class MathController {
 
   @Get('resolve')
   resolve(@Body() { mathExpression }: ResolveDTO): any {
-    const result =
-      this.mathService.resolveMathExpressionFromString(mathExpression);
+    try {
+      const result =
+        this.mathService.resolveMathExpressionFromString(mathExpression);
 
-    return {
-      result,
-    };
+      return {
+        result,
+      };
+    } catch (error) {
+      console.log('Error resolving math expresssion from string', error);
+
+      return {
+        error: error?.message,
+      };
+    }
   }
 }
 
