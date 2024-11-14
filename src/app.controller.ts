@@ -1,13 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 
 import { AppService } from './app.service';
+import { AppInfo } from './app.types';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  async getAppInfo(): Promise<AppInfo> {
+    return await this.appService.getAppInfo();
   }
 }

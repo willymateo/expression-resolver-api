@@ -1,8 +1,8 @@
 {
   "name": "expression-resolver-api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "This API is capable of resolving basic mathematical expresssions in a string",
+  "author": "Willy Joao Mateo Espinoza",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
