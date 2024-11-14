@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { ApplyMathOperatorProps } from './math.types';
+import { ApplyLastOperatorProps, ApplyMathOperatorProps } from './math.types';
 
 @Injectable()
 class MathService {
-  static OPERATORS_PRIORITY = {
+  private static readonly OPERATORS_PRIORITY: Record<string, number> = {
     '+': 1,
     '-': 1,
     '*': 2,
@@ -23,11 +23,8 @@ class MathService {
 
       const isOpeningParenthesis = stringCharacter === '(';
       const isClosingParenthesis = stringCharacter === ')';
-      const isMathOperator =
-        MathService.OPERATORS_PRIORITY[stringCharacter] > 0;
-      const isNumber = !Number.isNaN(Number.parseInt(stringCharacter));
 
-      if (isNumber) {
+      if (this.characterIsNumber(stringCharacter)) {
         let num = '';
 
         // Check if the number has more than one digit
@@ -45,21 +42,14 @@ class MathService {
         mathOperators.push(stringCharacter);
       } else if (isClosingParenthesis) {
         while (mathOperators[mathOperators.length - 1] !== '(') {
-          const mathOperator = mathOperators.pop();
-          const rightNumber = numericValues.pop();
-          const leftNumber = numericValues.pop();
-
-          const result = this.applyMathOperator({
-            mathOperator,
-            leftNumber,
-            rightNumber,
+          this.applyLastOperator({
+            numericValues,
+            mathOperators,
           });
-
-          numericValues.push(result);
         }
 
         mathOperators.pop(); // Remove '('
-      } else if (isMathOperator) {
+      } else if (this.characterIsMathOperator(stringCharacter)) {
         while (
           mathOperators.length &&
           mathOperators[mathOperators.length - 1] !== '(' &&
@@ -67,17 +57,10 @@ class MathService {
             mathOperators[mathOperators.length - 1]
           ] >= MathService.OPERATORS_PRIORITY[stringCharacter]
         ) {
-          const mathOperator = mathOperators.pop();
-          const rightNumber = numericValues.pop();
-          const leftNumber = numericValues.pop();
-
-          const result = this.applyMathOperator({
-            mathOperator,
-            leftNumber,
-            rightNumber,
+          this.applyLastOperator({
+            numericValues,
+            mathOperators,
           });
-
-          numericValues.push(result);
         }
 
         mathOperators.push(stringCharacter);
@@ -87,20 +70,30 @@ class MathService {
     }
 
     while (mathOperators.length) {
-      const mathOperator = mathOperators.pop();
-      const rightNumber = numericValues.pop();
-      const leftNumber = numericValues.pop();
-
-      const result = this.applyMathOperator({
-        mathOperator,
-        leftNumber,
-        rightNumber,
+      this.applyLastOperator({
+        numericValues,
+        mathOperators,
       });
-
-      numericValues.push(result);
     }
 
     return numericValues[0];
+  }
+
+  private applyLastOperator({
+    mathOperators = [],
+    numericValues = [],
+  }: ApplyLastOperatorProps) {
+    const mathOperator = mathOperators.pop();
+    const rightNumber = numericValues.pop();
+    const leftNumber = numericValues.pop();
+
+    const result = this.applyMathOperator({
+      mathOperator,
+      leftNumber,
+      rightNumber,
+    });
+
+    numericValues.push(result);
   }
 
   private applyMathOperator({
@@ -120,6 +113,14 @@ class MathService {
       default:
         throw new Error(`Unknown math operator: ${mathOperator}`);
     }
+  }
+
+  private characterIsMathOperator(stringCharacter: string): boolean {
+    return stringCharacter in MathService.OPERATORS_PRIORITY;
+  }
+
+  private characterIsNumber(stringCharacter: string): boolean {
+    return !Number.isNaN(Number.parseInt(stringCharacter));
   }
 }
 
