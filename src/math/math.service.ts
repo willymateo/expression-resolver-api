@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 class MathService {
-  resolve(stringExpression: string): number {
+  resolve(mathExpressionString: string): number {
     console.log({
-      stringExpression,
+      mathExpressionString,
     });
 
     return 0;
