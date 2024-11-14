@@ -81,6 +81,8 @@ class MathService {
         }
 
         mathOperators.push(stringCharacter);
+      } else {
+        throw new Error(`Unexpected token '${stringCharacter}'`);
       }
     }
 

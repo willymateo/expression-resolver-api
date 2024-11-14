@@ -16,8 +16,17 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return the app info', () => {
-      expect(appController.getAppInfo()).toBe({});
+    it('should return the app info', async () => {
+      const packageJson = await import('../package.json');
+      const appInfo = await appController.getAppInfo();
+
+      expect(appInfo).toEqual({
+        name: packageJson?.name,
+        author: packageJson?.author,
+        version: packageJson?.version,
+        description: packageJson?.description,
+        environment: process.env.NODE_ENV || 'development',
+      });
     });
   });
 });
