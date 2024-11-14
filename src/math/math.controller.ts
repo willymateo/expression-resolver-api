@@ -11,7 +11,8 @@ class MathController {
 
   @Get('resolve')
   resolve(@Body() { mathExpression }: ResolveDTO): any {
-    const result = this.mathService.resolve(mathExpression);
+    const result =
+      this.mathService.resolveMathExpressionFromString(mathExpression);
 
     return {
       result,
